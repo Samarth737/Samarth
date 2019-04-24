@@ -1,0 +1,112 @@
+import java.util.*;
+public class Student {
+
+    String Name;
+    float CGPA;
+    int Token;
+
+    /**
+     * Parameterized constructor
+     *
+     * @param Name name of the student
+     * @param CGPA CGPA of the student
+     * @param Token unique token assigned to student
+     */
+    public Student(String Name, float CGPA, int Token) {
+        this.Name = Name;
+        this.CGPA = CGPA;
+        this.Token = Token;
+    }
+
+    //getter and setter methods of data members
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String Name) {
+        this.Name = Name;
+    }
+
+    public Float getCGPA() {
+        return CGPA;
+    }
+
+    public void setCGPA(float CGPA) {
+        this.CGPA = CGPA;
+    }
+
+    public Integer getToken() {
+        return Token;
+    }
+
+    public void setToken(int Token) {
+        this.Token = Token;
+    }
+
+    public static void main(String... args) {
+
+        List<Student> studentList = new ArrayList<>();
+
+        Scanner input = new Scanner(System.in); //reading from standard input
+
+        int eventCount = Integer.parseInt(input.nextLine().trim()); //number of events
+
+        String[] data; //for storing data at each line i.e. EVENT [Student data]
+
+        String previousEvent = new String();
+
+        //reading events iteratively
+        for (int i = 0; i < eventCount; i++) {
+            data = input.nextLine().trim().split(" ");
+            if (data[0].equals("ENTER")) {
+                previousEvent = data[0];
+                studentList.add(new Student(data[1], Float.parseFloat(data[2]), Integer.parseInt(data[3])));
+            } else if (data[0].equals("SERVED")) {
+
+                //No need to sort if previous event was SERVED
+                if (!previousEvent.equals("SERVED")) {
+                    previousEvent = data[0];
+                    Collections.sort(studentList, new StudentSortingComparator());
+                }
+                studentList.remove(studentList.size() - 1);
+            }
+        }
+
+        //Output
+        //if list is empty printing EMPTY else printing names of students who are yet to be served
+        if (studentList.isEmpty()) {
+            System.out.println("EMPTY");
+        } else {
+            for (int j = (studentList.size() - 1); j >= 0; j--) {
+                System.out.println(studentList.get(j).getName());
+            }
+        }
+    }
+
+}
+
+//implementing comparator interface for custom sorting of Student objects
+class StudentSortingComparator implements Comparator<Student> {
+
+    @Override
+    public int compare(Student student1, Student student2) {
+        int CGPA_Compare = student1.getCGPA().compareTo(student2.getCGPA());
+        if (CGPA_Compare == 0) {
+            int NameCompare = student1.getName().compareTo(student2.getName());
+            int TokenCompare = student1.getToken().compareTo(student2.getToken());
+            if (NameCompare == 0) {
+                if(TokenCompare < 0){
+                    return 1;
+                }else{
+                    return -1;
+                }
+            } else if (NameCompare < 0) {
+                return 1;
+            } else {
+                return -1;
+            }
+        } else {
+            return CGPA_Compare;
+        }
+    }
+}
